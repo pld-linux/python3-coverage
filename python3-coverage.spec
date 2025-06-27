@@ -66,13 +66,17 @@ kodu, który mógłby zostać wykonany, ale nie był.
 %build
 %py3_build
 
+export PYTHONPATH=$(echo $(pwd)/build-3/lib.*)
 %if %{with tests}
-%{__python3} igor.py test_with_tracer py
-%{__python3} igor.py test_with_tracer c
+%{__python3} igor.py zip_mods
+%{__python3} igor.py test_with_core ctrace
+%{__python3} igor.py test_with_core sysmon
+%{__python3} igor.py remove_extension
+%{__python3} igor.py test_with_core pytrace
 %endif
 
 %if %{with doc}
-sphinx-build -b html -aqE doc doc/_build/html
+sphinx-build-3 -b html -aqE doc doc/_build/html
 %endif
 
 %install
