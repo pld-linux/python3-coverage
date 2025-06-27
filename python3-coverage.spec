@@ -9,38 +9,43 @@ Summary:	Tool for measuring code coverage of Python programs
 Summary(pl.UTF-8):	Narzędzie do szacowania pokrycia kodu programów w Pythonie
 Name:		python3-%{module}
 Version:	7.6.11
-Release:	3
+Release:	4
 License:	Apache v2.0
 Group:		Development/Languages/Python
 #Source0Download: https://pypi.org/simple/coverage/
 Source0:	https://files.pythonhosted.org/packages/source/c/coverage/%{module}-%{version}.tar.gz
 # Source0-md5:	ceffbc1c0eeb3001969f6a1c50c4ddbd
 URL:		http://coverage.readthedocs.org/
-BuildRequires:	python3-devel >= 1:3.5
+BuildRequires:	python3-devel >= 1:3.9
 BuildRequires:	python3-setuptools >= 1:42.0.2
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.714
 %if %{with tests}
-BuildRequires:	python3-eventlet >= 0.25.1
-BuildRequires:	python3-flaky >= 3.7.0
-BuildRequires:	python3-greenlet >= 0.4.15
-BuildRequires:	python3-hypothesis >= 4.57.1
-BuildRequires:	python3-pycontracts >= 1.8.12
-BuildRequires:	python3-pytest >= 4.6.11
-BuildRequires:	python3-pytest-xdist >= 1.34.0
-BuildRequires:	python3-unittest-mixins >= 1.6
+BuildRequires:	python3-eventlet >= 0.39
+BuildRequires:	python3-flaky >= 3.8
+BuildRequires:	python3-gevent >= 24.11
+BuildRequires:	python3-greenlet >= 3.1
+BuildRequires:	python3-hypothesis >= 6
+BuildRequires:	python3-pytest >= 8
+BuildRequires:	python3-pytest-xdist >= 3.6
+%if "%{_ver_lt %{py3_ver} 3.11}" == "1"
+BuildRequires:	python3-tomli >= 2.1
+%endif
 %endif
 %if %{with doc}
-BuildRequires:	python3-doc8 >= 0.8.1
+BuildRequires:	python3-cogapp >= 3.4
+BuildRequires:	python3-doc8 >= 1.1
 BuildRequires:	python3-pyenchant >= 3.2.0
-BuildRequires:	python3-sphinx_autobuild >= 2020.9.1
-BuildRequires:	python3-sphinx_rtd_theme >= 0.5.1
-BuildRequires:	python3-sphinx_tabs >= 2.0.0
+BuildRequires:	python3-sphinx_autobuild >= 2024.10
+BuildRequires:	python3-sphinx_rtd_theme >= 3.0
+BuildRequires:	python3-sphinx_code_tabs >= 0.5
+BuildRequires:	python3-sphinx_lint >= 1.0
 BuildRequires:	python3-sphinxcontrib-restbuilder >= 0.3
-BuildRequires:	python3-sphinxcontrib-spelling >= 7.1.0
-BuildRequires:	sphinx-pdg-3 >= 3.4.3
+BuildRequires:	python3-sphinxcontrib-spelling >= 8.0
+BuildRequires:	sphinx-pdg-3 >= 8.1
 %endif
 Requires:	python3-modules >= 1:3.9
+Conflicts:	python-coverage < 5.5-3
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -81,11 +86,14 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc CHANGES.rst CONTRIBUTORS.txt NOTICE.txt README.rst
+%attr(755,root,root) %{_bindir}/coverage
 %attr(755,root,root) %{_bindir}/coverage3
 %attr(755,root,root) %{_bindir}/coverage-%{py3_ver}
 %dir %{py3_sitedir}/coverage
 %attr(755,root,root) %{py3_sitedir}/coverage/tracer.cpython-*.so
 %{py3_sitedir}/coverage/*.py
+%{py3_sitedir}/coverage/*.pyi
+%{py3_sitedir}/coverage/py.typed
 %{py3_sitedir}/coverage/__pycache__
 %{py3_sitedir}/coverage/htmlfiles
 %{py3_sitedir}/coverage-%{version}-py*.egg-info
