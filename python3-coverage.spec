@@ -8,43 +8,44 @@
 Summary:	Tool for measuring code coverage of Python programs
 Summary(pl.UTF-8):	Narzędzie do szacowania pokrycia kodu programów w Pythonie
 Name:		python3-%{module}
-Version:	7.6.11
-Release:	4
+Version:	7.10.7
+Release:	1
 License:	Apache v2.0
 Group:		Development/Languages/Python
 #Source0Download: https://pypi.org/simple/coverage/
 Source0:	https://files.pythonhosted.org/packages/source/c/coverage/%{module}-%{version}.tar.gz
-# Source0-md5:	ceffbc1c0eeb3001969f6a1c50c4ddbd
+# Source0-md5:	6dd415363fa3b40d67f5510a684151e4
 URL:		http://coverage.readthedocs.org/
-BuildRequires:	python3-devel >= 1:3.9
+BuildRequires:	python3-devel >= 1:3.10
 BuildRequires:	python3-setuptools >= 1:42.0.2
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.714
 %if %{with tests}
 BuildRequires:	python3-eventlet >= 0.39
-BuildRequires:	python3-flaky >= 3.8
+BuildRequires:	python3-flaky >= 3.8.1
 BuildRequires:	python3-gevent >= 24.11
 BuildRequires:	python3-greenlet >= 3.1
-BuildRequires:	python3-hypothesis >= 6
-BuildRequires:	python3-pytest >= 8
-BuildRequires:	python3-pytest-xdist >= 3.6
+BuildRequires:	python3-hypothesis >= 6.139.2
+BuildRequires:	python3-pytest >= 8.4.2
+BuildRequires:	python3-pytest-xdist >= 3.8
 %if "%{_ver_lt %{py3_ver} 3.11}" == "1"
-BuildRequires:	python3-tomli >= 2.1
+BuildRequires:	python3-tomli >= 2.2.1
 %endif
 %endif
 %if %{with doc}
-BuildRequires:	python3-cogapp >= 3.4
-BuildRequires:	python3-doc8 >= 1.1
-BuildRequires:	python3-pyenchant >= 3.2.0
-BuildRequires:	python3-sphinx_autobuild >= 2024.10
-BuildRequires:	python3-sphinx_rtd_theme >= 3.0
-BuildRequires:	python3-sphinx_code_tabs >= 0.5
+BuildRequires:	python3-cogapp >= 3.6
+BuildRequires:	python3-doc8 >= 2.0
+BuildRequires:	python3-pyenchant >= 3.3.0
+BuildRequires:	python3-scriv >= 1.7
+BuildRequires:	python3-sphinx_autobuild >= 2025.8.25
+BuildRequires:	python3-sphinx_rtd_theme >= 3.0.2
+BuildRequires:	python3-sphinx_code_tabs >= 0.5.5
 BuildRequires:	python3-sphinx_lint >= 1.0
 BuildRequires:	python3-sphinxcontrib-restbuilder >= 0.3
-BuildRequires:	python3-sphinxcontrib-spelling >= 8.0
-BuildRequires:	sphinx-pdg-3 >= 8.1
+BuildRequires:	python3-sphinxcontrib-spelling >= 8.0.1
+BuildRequires:	sphinx-pdg-3 >= 8.2.3
 %endif
-Requires:	python3-modules >= 1:3.9
+Requires:	python3-modules >= 1:3.10
 Conflicts:	python-coverage < 5.5-3
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -66,13 +67,15 @@ kodu, który mógłby zostać wykonany, ale nie był.
 %build
 %py3_build
 
-export PYTHONPATH=$(echo $(pwd)/build-3/lib.*)
+export PYTHONPATH=$(readlink -f build-3/lib.*)
 %if %{with tests}
+export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
+export PYTEST_PLUGINS=flaky.flaky_pytest_plugin,xdist.plugin
 %{__python3} igor.py zip_mods
-%{__python3} igor.py test_with_core ctrace
-%{__python3} igor.py test_with_core sysmon
 %{__python3} igor.py remove_extension
 %{__python3} igor.py test_with_core pytrace
+%{__python3} igor.py test_with_core ctrace
+%{__python3} igor.py test_with_core sysmon
 %endif
 
 %if %{with doc}
